@@ -14,18 +14,18 @@ import java.io.IOException;
 @RestController
 public class TestController {
 
-    private final Logger logger = LoggerFactory.getLogger(TestController.class);
+  private final Logger logger = LoggerFactory.getLogger(TestController.class);
 
-    @Autowired
-    private AmazonS3Service amazonClient;
+  @Autowired
+  private AmazonS3Service amazonClient;
 
-    @PostMapping("/upload")
-    public void uploadFile(HttpServletRequest request,
-                           @RequestPart(value = "file") MultipartFile file) {
-        try {
-            this.amazonClient.uploadFile(file);
-        } catch (IOException exception) {
-            logger.error("Exception during upload : {}", exception.getMessage());
-        }
+  @PostMapping("/upload")
+  public void uploadFile(HttpServletRequest request,
+      @RequestPart(value = "file") MultipartFile file) {
+    try {
+      this.amazonClient.uploadFile(file);
+    } catch (IOException exception) {
+      logger.error("Exception during upload : {}", exception.getMessage());
     }
+  }
 }

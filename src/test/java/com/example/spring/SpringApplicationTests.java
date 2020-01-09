@@ -24,45 +24,47 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import(TestConfig.class)
 @ActiveProfiles("test")
 public class SpringApplicationTests {
-    private S3Mock api;
+  private S3Mock api;
 
-    @Value("${amazonProperties.bucketName}")
-    private String bucketName;
+  @Value("${amazonProperties.bucketName}")
+  private String bucketName;
 
-    @Autowired
-    TestRestTemplate testRestTemplate;
+  @Autowired
+  TestRestTemplate testRestTemplate;
 
 
-    @Before
-    public void before() {
-        api = new S3Mock.Builder().withPort(8001).withInMemoryBackend().build();
-        api.start();
-        amazonS3.createBucket(bucketName);
-    }
+  @Before
+  public void before() {
+    api = new S3Mock.Builder().withPort(8001).withInMemoryBackend().build();
+    api.start();
+    amazonS3.createBucket(bucketName);
+  }
 
-    @After
-    public void after() {
-        api.stop();
-    }
+  @After
+  public void after() {
+    api.stop();
+  }
 
-    @Autowired
-    private AmazonS3 amazonS3;
+  @Autowired
+  private AmazonS3 amazonS3;
 
-    @Test
-    public void testS3FileUploadEndpoint() {
-        LinkedMultiValueMap<String, Object> parameters = new LinkedMultiValueMap<String, Object>();
-        parameters.add("file", new org.springframework.core.io.ClassPathResource("test.txt"));
+  @Test
+  public void testS3FileUploadEndpoint() {
+    LinkedMultiValueMap<String, Object> parameters = new LinkedMultiValueMap<String, Object>();
+    parameters.add("file", new org.springframework.core.io.ClassPathResource("test.txt"));
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
-        HttpEntity<LinkedMultiValueMap<String, Object>> entity = new HttpEntity<LinkedMultiValueMap<String, Object>>(parameters, headers);
+    HttpEntity<LinkedMultiValueMap<String, Object>> entity =
+        new HttpEntity<LinkedMultiValueMap<String, Object>>(parameters, headers);
 
-        ResponseEntity<String> response = testRestTemplate.exchange("/upload", HttpMethod.POST, entity, String.class, "");
+    ResponseEntity<String> response =
+        testRestTemplate.exchange("/upload", HttpMethod.POST, entity, String.class, "");
 
-        assertThat(response.getStatusCodeValue()).isEqualTo(200);
+    assertThat(response.getStatusCodeValue()).isEqualTo(200);
 
-        assertEquals(amazonS3.getObject(bucketName, "pre-test.txt").getKey(), "pre-test.txt");
-    }
+    assertEquals(amazonS3.getObject(bucketName, "pre-test.txt").getKey(), "pre-test.txt");
+  }
 }
 

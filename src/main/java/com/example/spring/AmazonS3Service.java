@@ -14,33 +14,33 @@ import java.util.Objects;
 
 @Service
 class AmazonS3Service {
-    @Autowired
-    private AmazonS3 s3client;
+  @Autowired
+  private AmazonS3 s3client;
 
-    @Value("${amazonProperties.bucketName}")
-    private String bucketName;
+  @Value("${amazonProperties.bucketName}")
+  private String bucketName;
 
-    String uploadFile(MultipartFile multipartFile) throws IOException {
-        File file = convertMultiPartToFile(multipartFile);
-        String fileName = generateFileName(file.getName());
-        uploadFileTos3bucket(fileName, file);
-        file.deleteOnExit();
-        return fileName;
+  String uploadFile(MultipartFile multipartFile) throws IOException {
+    File file = convertMultiPartToFile(multipartFile);
+    String fileName = generateFileName(file.getName());
+    uploadFileTos3bucket(fileName, file);
+    file.deleteOnExit();
+    return fileName;
+  }
+
+  private File convertMultiPartToFile(MultipartFile file) throws IOException {
+    File convFile = new File(Objects.requireNonNull(file.getOriginalFilename()));
+    try (FileOutputStream fos = new FileOutputStream(convFile)) {
+      fos.write(file.getBytes());
     }
+    return convFile;
+  }
 
-    private File convertMultiPartToFile(MultipartFile file) throws IOException {
-        File convFile = new File(Objects.requireNonNull(file.getOriginalFilename()));
-        try (FileOutputStream fos = new FileOutputStream(convFile)) {
-            fos.write(file.getBytes());
-        }
-        return convFile;
-    }
+  private String generateFileName(String fileName) {
+    return "pre-" + fileName;
+  }
 
-    private String generateFileName(String fileName) {
-        return "pre-" + fileName;
-    }
-
-    private void uploadFileTos3bucket(String fileName, File file) {
-        s3client.putObject(new PutObjectRequest(bucketName, fileName, file));
-    }
+  private void uploadFileTos3bucket(String fileName, File file) {
+    s3client.putObject(new PutObjectRequest(bucketName, fileName, file));
+  }
 }

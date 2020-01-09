@@ -13,14 +13,12 @@ import org.springframework.context.annotation.Profile;
 @Profile({"test"})
 public class TestConfig {
 
-    @Bean
-    public AmazonS3 testString() {
-        AwsClientBuilder.EndpointConfiguration endpoint = new AwsClientBuilder.EndpointConfiguration("http://localhost:8001", "us-west-2");
-        return AmazonS3ClientBuilder
-                .standard()
-                .withPathStyleAccessEnabled(true)
-                .withEndpointConfiguration(endpoint)
-                .withCredentials(new AWSStaticCredentialsProvider(new AnonymousAWSCredentials()))
-                .build();
-    }
+  @Bean
+  public AmazonS3 testString() {
+    AwsClientBuilder.EndpointConfiguration endpoint =
+        new AwsClientBuilder.EndpointConfiguration("http://localhost:8001", "us-west-2");
+    return AmazonS3ClientBuilder.standard().withPathStyleAccessEnabled(true)
+        .withEndpointConfiguration(endpoint)
+        .withCredentials(new AWSStaticCredentialsProvider(new AnonymousAWSCredentials())).build();
+  }
 }
